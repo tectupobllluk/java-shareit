@@ -2,13 +2,13 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.markers.Create;
 
-import java.util.Collections;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController
@@ -19,45 +19,44 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public Item createItem(@RequestHeader(value = "X-Sharer-User-Id") Long ownerId,
-                           @RequestBody ItemDto itemDto) {
-        if (ownerId == null) {
-            throw new BadRequestException("Owner can't be empty!");
-        }
+    public ItemDto createItem(@RequestHeader(value = "X-Sharer-User-Id") @NotNull Long ownerId,
+                              @RequestBody @Validated(Create.class) ItemDto itemDto) {
         log.info("Create item: {} - Started!", itemDto);
-        Item item = ItemMapper.toItem(ownerId, itemDto);
-        itemService.saveItem(item);
+        ItemDto item = itemService.saveItem(ownerId, itemDto);
         log.info("Create item: {} - Finished!", item);
         return item;
     }
 
     @PatchMapping("/{itemId}")
-    public Item updateItem(@RequestHeader("X-Sharer-User-Id") Long ownerId, @RequestBody ItemDto itemDto,
-                           @PathVariable Long itemId) {
-        if (ownerId == null) {
-            throw new BadRequestException("Owner can't be empty!");
-        }
-        return itemService.updateItem(ownerId, itemDto, itemId);
+    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId, @RequestBody ItemDto itemDto,
+                              @PathVariable Long itemId) {
+        log.info("Update item: {} - Started!", itemDto);
+        ItemDto item = itemService.updateItem(ownerId, itemDto, itemId);
+        log.info("Update item: {} - Finished!", item);
+        return item;
     }
 
     @GetMapping("/{itemId}")
-    public Item getItem(@PathVariable Long itemId) {
-        return itemService.getItem(itemId);
+    public ItemDto getItem(@PathVariable Long itemId) {
+        log.info("Get item with id {} - Started!", itemId);
+        ItemDto item = itemService.getItem(itemId);
+        log.info("Get item: {} - Finished!", item);
+        return item;
     }
 
     @GetMapping
-    public List<Item> getAllOwnerItems(@RequestHeader("X-Sharer-User-Id") Long ownerId) {
-        if (ownerId == null) {
-            throw new BadRequestException("Owner can't be empty!");
-        }
-        return itemService.getAllOwnerItems(ownerId);
+    public List<ItemDto> getAllOwnerItems(@RequestHeader("X-Sharer-User-Id") Long ownerId) {
+        log.info("Get all owner items with id {} - Started!", ownerId);
+        List<ItemDto> ownerItems = itemService.getAllOwnerItems(ownerId);
+        log.info("Get all owner items: {} - Finished!", ownerItems);
+        return ownerItems;
     }
 
     @GetMapping("/search")
-    public List<Item> searchItem(@RequestParam String text) {
-        if (text.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return itemService.searchItem(text);
+    public List<ItemDto> searchItem(@RequestParam String text) {
+        log.info("Search items with text {} - Started!", text);
+        List<ItemDto> searchedItems = itemService.searchItem(text);
+        log.info("Search items: {} - Finished!", searchedItems);
+        return searchedItems;
     }
 }

@@ -1,10 +1,7 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import ru.practicum.shareit.request.ItemRequest;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import ru.practicum.shareit.user.model.User;
 
 @Data
 @AllArgsConstructor
@@ -12,12 +9,9 @@ import javax.validation.constraints.NotNull;
 public class Item {
     @EqualsAndHashCode.Exclude
     private Long id;
-    @NotEmpty
     private String name;
-    @NotEmpty
     private String description;
-    @NotNull
     private Boolean available;
-    private Long owner;
-    private ItemRequest request;
+    private User owner;
+    private Long requestId;
 }
