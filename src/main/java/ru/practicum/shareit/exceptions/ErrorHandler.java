@@ -6,6 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.practicum.shareit.exceptions.model.ErrorResponse;
 
 import javax.validation.ValidationException;
@@ -44,9 +45,9 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleBadEmailException(final BadEmailException e) {
-        log.info("BadEmailException: {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+    public ErrorResponse handleMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException e) {
+        log.info("Unknown state: UNSUPPORTED_STATUS");
+        return new ErrorResponse("Unknown state: UNSUPPORTED_STATUS");
     }
 
     @ExceptionHandler
