@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.markers.Create;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -19,44 +22,54 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ItemDto createItem(@RequestHeader(value = "X-Sharer-User-Id") @NotNull Long ownerId,
-                              @RequestBody @Validated(Create.class) ItemDto itemDto) {
+    public ItemResponseDto createItem(@RequestHeader(value = "X-Sharer-User-Id") @NotNull Long ownerId,
+                                      @RequestBody @Validated(Create.class) ItemDto itemDto) {
         log.info("Create item: {} - Started!", itemDto);
-        ItemDto item = itemService.saveItem(ownerId, itemDto);
+        ItemResponseDto item = itemService.saveItem(ownerId, itemDto);
         log.info("Create item: {} - Finished!", item);
         return item;
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId, @RequestBody ItemDto itemDto,
-                              @PathVariable Long itemId) {
+    public ItemResponseDto updateItem(@RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId, @RequestBody ItemDto itemDto,
+                                      @PathVariable Long itemId) {
         log.info("Update item: {} - Started!", itemDto);
-        ItemDto item = itemService.updateItem(ownerId, itemDto, itemId);
+        ItemResponseDto item = itemService.updateItem(ownerId, itemDto, itemId);
         log.info("Update item: {} - Finished!", item);
         return item;
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItem(@PathVariable Long itemId) {
+    public ItemResponseDto getItem(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId, @PathVariable Long itemId) {
         log.info("Get item with id {} - Started!", itemId);
-        ItemDto item = itemService.getItem(itemId);
+        ItemResponseDto item = itemService.getItem(userId, itemId);
         log.info("Get item: {} - Finished!", item);
         return item;
     }
 
     @GetMapping
-    public List<ItemDto> getAllOwnerItems(@RequestHeader("X-Sharer-User-Id") Long ownerId) {
+    public List<ItemResponseDto> getAllOwnerItems(@RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId) {
         log.info("Get all owner items with id {} - Started!", ownerId);
-        List<ItemDto> ownerItems = itemService.getAllOwnerItems(ownerId);
+        List<ItemResponseDto> ownerItems = itemService.getAllOwnerItems(ownerId);
         log.info("Get all owner items: {} - Finished!", ownerItems);
         return ownerItems;
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItem(@RequestParam String text) {
+    public List<ItemResponseDto> searchItem(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
+                                            @RequestParam String text) {
         log.info("Search items with text {} - Started!", text);
-        List<ItemDto> searchedItems = itemService.searchItem(text);
+        List<ItemResponseDto> searchedItems = itemService.searchItem(userId, text);
         log.info("Search items: {} - Finished!", searchedItems);
         return searchedItems;
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") Long ownerId, @PathVariable Long itemId,
+                                 @RequestBody @Valid CommentDto commentDto) {
+        log.info("Add comment: {} - Started!", commentDto);
+        CommentDto responseCommentDto = itemService.addComment(ownerId, itemId, commentDto);
+        log.info("Add comment: {} - Finished!", responseCommentDto);
+        return responseCommentDto;
     }
 }
