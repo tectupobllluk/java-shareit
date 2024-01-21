@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.booking.BookingMapper;
@@ -89,38 +90,40 @@ public class BookingServiceImpl implements BookingService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id - " + userId + " not found"));
         List<BookingDtoResponse> resultList = new ArrayList<>();
+        Sort sort = Sort.by(Sort.Direction.DESC, "creationTime");
         switch (state) {
             case ALL:
-                resultList = bookingRepository.findByBookerOrderByCreationTimeDesc(user).stream()
+                resultList = bookingRepository.findByBooker(user, sort).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case PAST:
                 resultList = bookingRepository
-                        .findByBookerAndEndBeforeOrderByCreationTimeDesc(user, LocalDateTime.now()).stream()
+                        .findByBookerAndEndBefore(user, LocalDateTime.now(), sort).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case FUTURE:
                 resultList = bookingRepository
-                        .findByBookerAndStartAfterOrderByCreationTimeDesc(user, LocalDateTime.now()).stream()
+                        .findByBookerAndStartAfter(user, LocalDateTime.now(), sort).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case CURRENT:
-                resultList = bookingRepository.findAllWithCurrentState(user, LocalDateTime.now()).stream()
+                sort = Sort.by(Sort.Direction.ASC, "creationTime");
+                resultList = bookingRepository.findAllWithCurrentState(user, LocalDateTime.now(), sort).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case WAITING:
                 resultList = bookingRepository
-                        .findByBookerAndStatusOrderByCreationTimeDesc(user, BookingStateEnum.WAITING).stream()
+                        .findByBookerAndStatus(user, BookingStateEnum.WAITING, sort).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case REJECTED:
                 resultList = bookingRepository
-                        .findByBookerAndStatusOrderByCreationTimeDesc(user, BookingStateEnum.REJECTED).stream()
+                        .findByBookerAndStatus(user, BookingStateEnum.REJECTED, sort).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
@@ -136,38 +139,40 @@ public class BookingServiceImpl implements BookingService {
             return Collections.emptyList();
         }
         List<BookingDtoResponse> resultList = new ArrayList<>();
+        Sort sort = Sort.by(Sort.Direction.DESC, "creationTime");
         switch (state) {
             case ALL:
-                resultList = bookingRepository.findByItem_OwnerOrderByCreationTimeDesc(user).stream()
+                resultList = bookingRepository.findByItem_Owner(user, sort).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case PAST:
                 resultList = bookingRepository
-                        .findByItem_OwnerAndEndBeforeOrderByCreationTimeDesc(user, LocalDateTime.now()).stream()
+                        .findByItem_OwnerAndEndBefore(user, LocalDateTime.now(), sort).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case FUTURE:
                 resultList = bookingRepository
-                        .findByItem_OwnerAndStartAfterOrderByCreationTimeDesc(user, LocalDateTime.now()).stream()
+                        .findByItem_OwnerAndStartAfter(user, LocalDateTime.now(), sort).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case CURRENT:
-                resultList = bookingRepository.findAllItemsBookingWithCurrentState(user, LocalDateTime.now()).stream()
+                sort = Sort.by(Sort.Direction.ASC, "creationTime");
+                resultList = bookingRepository.findAllItemsBookingWithCurrentState(user, LocalDateTime.now(), sort).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case WAITING:
                 resultList = bookingRepository
-                        .findByItem_OwnerAndStatusOrderByCreationTimeDesc(user, BookingStateEnum.WAITING).stream()
+                        .findByItem_OwnerAndStatus(user, BookingStateEnum.WAITING, sort).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case REJECTED:
                 resultList = bookingRepository
-                        .findByItem_OwnerAndStatusOrderByCreationTimeDesc(user, BookingStateEnum.REJECTED).stream()
+                        .findByItem_OwnerAndStatus(user, BookingStateEnum.REJECTED, sort).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;

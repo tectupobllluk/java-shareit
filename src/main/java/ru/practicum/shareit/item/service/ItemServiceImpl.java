@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.booking.model.Booking;
@@ -79,7 +80,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void loadBookings(ItemResponseDto itemResponseDto) {
-        List<Booking> bookingList = bookingRepository.findByItem_IdOrderByStartAsc(itemResponseDto.getId());
+        Sort sort = Sort.by(Sort.Direction.ASC, "start");
+        List<Booking> bookingList = bookingRepository.findByItem_Id(itemResponseDto.getId(), sort);
         List<Booking> lastBookingList = bookingList.stream()
                 .filter(booking -> booking.getStart().isBefore(LocalDateTime.now()) &&
                         !booking.getStatus().equals(BookingStateEnum.REJECTED))
@@ -115,7 +117,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void loadComments(ItemResponseDto itemDto) {
-        List<Comment> commentList = commentRepository.findByItem_IdOrderByCreationTimeDesc(itemDto.getId());
+        Sort sort = Sort.by(Sort.Direction.DESC, "creationTime");
+        List<Comment> commentList = commentRepository.findByItem_Id(itemDto.getId(), sort);
         if (!commentList.isEmpty()) {
             itemDto.setComments(commentList.stream()
                     .map(CommentMapper::toCommentDto)
@@ -143,7 +146,8 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item with id " + itemId + " is not created!"));
 
-        List<Booking> bookings = bookingRepository.findByItem_IdOrderByStartAsc(itemId).stream()
+        Sort sort = Sort.by(Sort.Direction.ASC, "start");
+        List<Booking> bookings = bookingRepository.findByItem_Id(itemId, sort).stream()
                 .filter(booking -> booking.getBooker().equals(owner) &&
                         booking.getEnd().isBefore(LocalDateTime.now()))
                 .collect(Collectors.toList());

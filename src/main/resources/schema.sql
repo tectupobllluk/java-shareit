@@ -28,7 +28,8 @@ create table items (
     request_id BIGINT,
     CONSTRAINT fk_owner_user FOREIGN KEY (owner_id) REFERENCES users (id),
     CONSTRAINT fk_item_request FOREIGN KEY (request_id)
-    REFERENCES requests (id) ON DELETE CASCADE
+    REFERENCES requests (id) ON DELETE CASCADE,
+    CONSTRAINT UQ_OWNER_ITEM_NAME UNIQUE(owner_id, name)
 );
 
 create table bookings (
@@ -38,7 +39,7 @@ create table bookings (
     item_id BIGINT NOT NULL,
     booker_id BIGINT NOT NULL,
     status VARCHAR NOT NULL,
-    creation_time TIMESTAMP WITHOUT TIME ZONE,
+    creation_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT fk_booking_item FOREIGN KEY (item_id) REFERENCES items (id),
     CONSTRAINT fk_booker_user FOREIGN KEY (booker_id)
     REFERENCES users (id) ON DELETE CASCADE
@@ -49,7 +50,7 @@ create table comments (
     text VARCHAR NOT NULL,
     item_id BIGINT NOT NULL,
     author_id BIGINT NOT NULL,
-    creation_time TIMESTAMP WITHOUT TIME ZONE,
+    creation_time TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT fk_comment_item FOREIGN KEY (item_id)
     REFERENCES items (id) ON DELETE CASCADE,
     CONSTRAINT fk_author_user FOREIGN KEY (author_id)
