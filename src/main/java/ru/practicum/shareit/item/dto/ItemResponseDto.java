@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@Builder
 @AllArgsConstructor
+@Builder
 @NoArgsConstructor
 public class ItemResponseDto {
     @EqualsAndHashCode.Exclude
@@ -20,6 +20,7 @@ public class ItemResponseDto {
     private Booking lastBooking;
     private Booking nextBooking;
     private List<CommentDto> comments = new ArrayList<>();
+    private Long requestId;
 
     @AllArgsConstructor
     @Data

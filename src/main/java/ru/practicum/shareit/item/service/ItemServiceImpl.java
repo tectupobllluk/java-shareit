@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -105,11 +107,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemResponseDto> getAllOwnerItems(Long ownerId) {
+    public List<ItemResponseDto> getAllOwnerItems(Long ownerId, Integer from, Integer size) {
         if (ownerId == null) {
             throw new BadRequestException("Owner can't be empty!");
         }
-        return itemRepository.findByOwner_IdOrderByIdAsc(ownerId).stream()
+        Sort sort = Sort.by(Sort.Direction.ASC, "id");
+        Pageable page = PageRequest.of(from / size, size, sort);
+        return itemRepository.findByOwner_Id(ownerId, page).stream()
                 .map(ItemMapper::toItemResponseDto)
                 .peek(this::loadBookings)
                 .peek(this::loadComments)
@@ -129,11 +133,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemResponseDto> searchItem(Long userId, String searchText) {
+    public List<ItemResponseDto> searchItem(Long userId, String searchText, Integer from, Integer size) {
         if (searchText.isEmpty()) {
             return Collections.emptyList();
         }
-        return itemRepository.search(searchText, userId).stream()
+        Pageable page = PageRequest.of(from / size, size);
+        return itemRepository.search(searchText, page).stream()
                 .map(ItemMapper::toItemResponseDto)
                 .peek(this::loadComments)
                 .collect(Collectors.toList());

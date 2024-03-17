@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-public class BookingDtoResponse {
+public class BookingResponseDto {
     @EqualsAndHashCode.Exclude
     private Long id;
     private LocalDateTime start;

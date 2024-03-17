@@ -12,12 +12,15 @@ import ru.practicum.shareit.markers.Create;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class ItemController {
     private final ItemService itemService;
 
@@ -31,7 +34,8 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public ItemResponseDto updateItem(@RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId, @RequestBody ItemDto itemDto,
+    public ItemResponseDto updateItem(@RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId,
+                                      @RequestBody ItemDto itemDto,
                                       @PathVariable Long itemId) {
         log.info("Update item: {} - Started!", itemDto);
         ItemResponseDto item = itemService.updateItem(ownerId, itemDto, itemId);
@@ -48,18 +52,22 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemResponseDto> getAllOwnerItems(@RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId) {
+    public List<ItemResponseDto> getAllOwnerItems(@RequestHeader("X-Sharer-User-Id") @NotNull Long ownerId,
+                                                  @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                  @Positive @RequestParam(defaultValue = "10") Integer size) {
         log.info("Get all owner items with id {} - Started!", ownerId);
-        List<ItemResponseDto> ownerItems = itemService.getAllOwnerItems(ownerId);
+        List<ItemResponseDto> ownerItems = itemService.getAllOwnerItems(ownerId, from, size);
         log.info("Get all owner items: {} - Finished!", ownerItems);
         return ownerItems;
     }
 
     @GetMapping("/search")
     public List<ItemResponseDto> searchItem(@RequestHeader("X-Sharer-User-Id") @NotNull Long userId,
-                                            @RequestParam String text) {
+                                            @RequestParam String text,
+                                            @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                            @Positive @RequestParam(defaultValue = "10") Integer size) {
         log.info("Search items with text {} - Started!", text);
-        List<ItemResponseDto> searchedItems = itemService.searchItem(userId, text);
+        List<ItemResponseDto> searchedItems = itemService.searchItem(userId, text, from, size);
         log.info("Search items: {} - Finished!", searchedItems);
         return searchedItems;
     }

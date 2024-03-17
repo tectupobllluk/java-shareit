@@ -1,7 +1,7 @@
 package ru.practicum.shareit.booking;
 
-import ru.practicum.shareit.booking.dto.BookingDtoRequest;
-import ru.practicum.shareit.booking.dto.BookingDtoResponse;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.enums.BookingStateEnum;
 import ru.practicum.shareit.item.model.Item;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 public class BookingMapper {
 
-    public static Booking fromBookingDtoRequest(User booker, Item item, BookingDtoRequest bookingDto) {
+    public static Booking fromBookingDtoRequest(User booker, Item item, BookingRequestDto bookingDto) {
         return Booking.builder()
                 .start(bookingDto.getStart())
                 .end(bookingDto.getEnd())
@@ -22,16 +22,16 @@ public class BookingMapper {
                 .build();
     }
 
-    public static BookingDtoResponse toBookingDtoResponse(Booking booking) {
+    public static BookingResponseDto toBookingDtoResponse(Booking booking) {
         Item item = booking.getItem();
         User user = booking.getBooker();
-        return BookingDtoResponse.builder()
+        return BookingResponseDto.builder()
                 .id(booking.getId())
                 .start(booking.getStart())
                 .end(booking.getEnd())
-                .item(new BookingDtoResponse.Item(
+                .item(new BookingResponseDto.Item(
                         item.getId(), item.getName(), item.getDescription(), item.getAvailable()))
-                .booker(new BookingDtoResponse.User(user.getId(), user.getName(), user.getEmail()))
+                .booker(new BookingResponseDto.User(user.getId(), user.getName(), user.getEmail()))
                 .status(booking.getStatus())
                 .build();
     }

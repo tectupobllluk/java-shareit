@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BookingDtoRequest {
+public class BookingRequestDto {
     private Long itemId;
     @NotNull
     @FutureOrPresent(message = "Booking start time must be in future or present")

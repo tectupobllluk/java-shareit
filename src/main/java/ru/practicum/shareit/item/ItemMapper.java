@@ -9,15 +9,6 @@ import java.util.Collections;
 
 public class ItemMapper {
 
-    public static ItemDto toItemDto(Item item) {
-        return ItemDto.builder()
-                .id(item.getId())
-                .name(item.getName())
-                .description(item.getDescription())
-                .available(item.getAvailable())
-                .build();
-    }
-
     public static ItemResponseDto toItemResponseDto(Item item) {
         return ItemResponseDto.builder()
                 .id(item.getId())
@@ -25,6 +16,7 @@ public class ItemMapper {
                 .description(item.getDescription())
                 .available(item.getAvailable())
                 .comments(Collections.emptyList())
+                .requestId(item.getRequestId())
                 .build();
     }
 
@@ -35,6 +27,7 @@ public class ItemMapper {
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
                 .owner(owner)
+                .requestId(itemDto.getRequestId())
                 .build();
     }
 }
