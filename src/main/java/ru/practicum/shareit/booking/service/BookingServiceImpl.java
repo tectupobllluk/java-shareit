@@ -51,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
                 bookingRequestDto.getEnd().isBefore(bookingRequestDto.getStart())) {
             throw new BadRequestException("Timestamps must not be equal or end before start");
         }
-        Booking booking = BookingMapper.fromBookingDtoRequest(booker, item, bookingRequestDto);
+        Booking booking = BookingMapper.toBooking(booker, item, bookingRequestDto);
         return BookingMapper.toBookingDtoResponse(bookingRepository.save(booking));
     }
 

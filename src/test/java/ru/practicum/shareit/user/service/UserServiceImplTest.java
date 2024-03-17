@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.transaction.Transactional;
@@ -13,6 +14,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Transactional
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class UserServiceImplTest {
 
     @Autowired

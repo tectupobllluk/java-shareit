@@ -49,7 +49,7 @@ class BookingRepositoryTest {
         ItemRequest itemRequest = new ItemRequest(1L, "itemRequest", owner, LocalDateTime.now());
         itemRequestRepository.save(itemRequest);
         Item item = new Item(1L, "nameBoatname", "description", true,
-                owner, 1L);
+                owner, itemRequest);
         itemRepository.save(item);
 
         Booking before = new Booking(1L, LocalDateTime.now().minusHours(2), LocalDateTime.now().minusHours(1), item,
@@ -92,12 +92,12 @@ class BookingRepositoryTest {
         ItemRequest itemRequest = new ItemRequest(1L, "itemRequest", owner, LocalDateTime.now());
         itemRequestRepository.save(itemRequest);
         Item item = new Item(1L, "nameBoatname", "description", true,
-                owner, 1L);
+                owner, itemRequest);
         itemRepository.save(item);
         ItemRequest secondItemRequest = new ItemRequest(2L, "secondItemRequest", owner, LocalDateTime.now());
         itemRequestRepository.save(secondItemRequest);
         Item secondItem = new Item(2L, "secondName", "description", true,
-                owner, 2L);
+                owner, secondItemRequest);
         itemRepository.save(secondItem);
 
         Booking before = new Booking(1L, LocalDateTime.now().minusHours(2), LocalDateTime.now().minusHours(1), item,

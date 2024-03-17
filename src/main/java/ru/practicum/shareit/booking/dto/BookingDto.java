@@ -2,8 +2,6 @@ package ru.practicum.shareit.booking.dto;
 
 import lombok.*;
 import ru.practicum.shareit.enums.BookingStateEnum;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 
@@ -11,12 +9,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-public class BookingResponseDto {
+public class BookingDto {
     @EqualsAndHashCode.Exclude
     private Long id;
     private LocalDateTime start;
     private LocalDateTime end;
-    private ItemDto item;
-    private UserDto booker;
+    private Long bookerId;
     private BookingStateEnum status;
+    private LocalDateTime creationTime;
 }

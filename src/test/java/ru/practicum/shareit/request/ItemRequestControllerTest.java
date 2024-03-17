@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestResponseDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
@@ -36,7 +37,7 @@ class ItemRequestControllerTest {
 
     private final ItemRequestDto itemRequestDto = new ItemRequestDto(1L, "description");
     private final ItemRequestResponseDto itemRequestResponseDto = new ItemRequestResponseDto(1L,
-            "description", List.of(new ItemRequestResponseDto.Item(1L, "name",
+            "description", List.of(new ItemDto(1L, "name",
             "description", true, 1L)), LocalDateTime.now());
     private final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
 

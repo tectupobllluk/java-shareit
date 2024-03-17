@@ -6,6 +6,8 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 import ru.practicum.shareit.enums.BookingStateEnum;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,9 +26,9 @@ class BookingResponseDtoTest {
     void testBookingResponseDto() throws Exception {
         LocalDateTime start = LocalDateTime.now().plusHours(1L);
         LocalDateTime end = LocalDateTime.now().plusHours(2L);
-        BookingResponseDto.Item item = new BookingResponseDto.Item(1L, "item name",
-                "item description", false);
-        BookingResponseDto.User booker = new BookingResponseDto.User(2L, "user name", "email@email.ru");
+        ItemDto item = new ItemDto(1L, "item name",
+                "item description", false, 1L);
+        UserDto booker = new UserDto(2L, "user name", "email@email.ru");
         BookingResponseDto bookingResponseDto = new BookingResponseDto(3L, start, end, item, booker,
                 BookingStateEnum.REJECTED);
 
@@ -40,6 +42,7 @@ class BookingResponseDtoTest {
         assertThat(result).extractingJsonPathStringValue("$.item.description")
                 .isEqualTo("item description");
         assertThat(result).extractingJsonPathBooleanValue("$.item.available").isEqualTo(false);
+        assertThat(result).extractingJsonPathNumberValue("$.item.requestId").isEqualTo(1);
         assertThat(result).extractingJsonPathNumberValue("$.booker.id").isEqualTo(2);
         assertThat(result).extractingJsonPathStringValue("$.booker.name").isEqualTo("user name");
         assertThat(result).extractingJsonPathStringValue("$.booker.email").isEqualTo("email@email.ru");

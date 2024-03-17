@@ -4,7 +4,6 @@ import lombok.*;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,11 +17,11 @@ public class ItemRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Exclude
     private Long id;
-    @NotNull
+    @Column(name = "description", nullable = false)
     private String description;
     @ManyToOne(fetch = FetchType.LAZY)
-    @NotNull
     @ToString.Exclude
+    @JoinColumn(name = "requester_id", nullable = false)
     private User requester;
     @Column(name = "creation_time", nullable = false)
     private LocalDateTime creationTime;

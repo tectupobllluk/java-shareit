@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.enums.BookingStateEnum;
 
 import java.time.LocalDateTime;
@@ -26,12 +27,12 @@ class ItemResponseDtoTest {
         LocalDateTime firstStart = LocalDateTime.now().plusHours(1L);
         LocalDateTime firstEnd = LocalDateTime.now().plusHours(2L);
         LocalDateTime firstCreation = LocalDateTime.now();
-        ItemResponseDto.Booking lastBooking = new ItemResponseDto.Booking(1L, firstStart,
+        BookingDto lastBooking = new BookingDto(1L, firstStart,
                 firstEnd, 6L, BookingStateEnum.APPROVED, firstCreation);
         LocalDateTime secondStart = LocalDateTime.now().plusHours(3L);
         LocalDateTime secondEnd = LocalDateTime.now().plusHours(4L);
         LocalDateTime secondCreation = LocalDateTime.now().plusSeconds(10L);
-        ItemResponseDto.Booking nextBooking = new ItemResponseDto.Booking(2L, secondStart,
+        BookingDto nextBooking = new BookingDto(2L, secondStart,
                 secondEnd, 7L, BookingStateEnum.WAITING, secondCreation);
         CommentDto firstComment = new CommentDto(3L, "first text",
                 "first author name", firstCreation);

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
+import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,9 +21,9 @@ class ItemRequestResponseDtoTest {
 
     @Test
     void testItemRequestResponseDto() throws Exception {
-        ItemRequestResponseDto.Item firstItem = new ItemRequestResponseDto.Item(1L, "first name",
+        ItemDto firstItem = new ItemDto(1L, "first name",
                 "first description", true, 1L);
-        ItemRequestResponseDto.Item secondItem = new ItemRequestResponseDto.Item(2L, "second name",
+        ItemDto secondItem = new ItemDto(2L, "second name",
                 "second description", true, 2L);
         LocalDateTime dateTime = LocalDateTime.now();
         ItemRequestResponseDto itemRequestResponseDto = new ItemRequestResponseDto(1L, "item",

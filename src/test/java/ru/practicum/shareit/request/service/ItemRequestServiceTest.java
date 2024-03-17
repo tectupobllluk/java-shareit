@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -45,16 +46,16 @@ class ItemRequestServiceTest {
     private ItemRequestService itemRequestService;
 
     private final User owner = new User(1L, "name", "email@email.ru");
-    private final Item item = new Item(1L, "itemName", "itemDescription",
-            true, owner, 11L);
-    private final ItemRequestDto itemRequestDto = new ItemRequestDto(1L, "description");
     private final ItemRequest itemRequest = new ItemRequest(1L, "description", owner,
             LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+    private final Item item = new Item(1L, "itemName", "itemDescription",
+            true, owner, itemRequest);
+    private final ItemRequestDto itemRequestDto = new ItemRequestDto(1L, "description");
     private final ItemRequestResponseDto itemRequestResponseDto = new ItemRequestResponseDto(1L,
             "description", Collections.emptyList(), LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
     private final ItemRequestResponseDto itemResponseDtoWithItem = new ItemRequestResponseDto(1L,
-            "description", List.of(new ItemRequestResponseDto.Item(1L, "itemName",
-            "itemDescription", true, 11L)),
+            "description", List.of(new ItemDto(1L, "itemName",
+            "itemDescription", true, 1L)),
             LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
     @Test

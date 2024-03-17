@@ -11,6 +11,8 @@ import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.enums.BookingStateEnum;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -37,8 +39,8 @@ class BookingControllerTest {
     private final BookingRequestDto bookingRequestDto = new BookingRequestDto(1L, LocalDateTime.now()
             .plusMinutes(10), LocalDateTime.now().plusHours(1));
     private final BookingResponseDto bookingResponseDto = new BookingResponseDto(1L, LocalDateTime.now(),
-            LocalDateTime.now().plusHours(1), new BookingResponseDto.Item(1L, "name", "description",
-            true), new BookingResponseDto.User(1L, "name", "email"), BookingStateEnum.APPROVED);
+            LocalDateTime.now().plusHours(1), new ItemDto(1L, "name", "description",
+            true, 1L), new UserDto(1L, "name", "email"), BookingStateEnum.APPROVED);
     private final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
 
     @Test
@@ -58,6 +60,7 @@ class BookingControllerTest {
                 .andExpect(jsonPath("$.item.name").value(bookingResponseDto.getItem().getName()))
                 .andExpect(jsonPath("$.item.description").value(bookingResponseDto.getItem().getDescription()))
                 .andExpect(jsonPath("$.item.available").value(bookingResponseDto.getItem().getAvailable()))
+                .andExpect(jsonPath("$.item.requestId").value(bookingResponseDto.getItem().getRequestId()))
                 .andExpect(jsonPath("$.booker.id").value(bookingResponseDto.getBooker().getId()))
                 .andExpect(jsonPath("$.booker.name").value(bookingResponseDto.getBooker().getName()))
                 .andExpect(jsonPath("$.booker.email").value(bookingResponseDto.getBooker().getEmail()))

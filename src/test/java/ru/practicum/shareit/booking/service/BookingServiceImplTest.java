@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.service;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.enums.BookingStateEnum;
@@ -24,6 +25,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @Transactional
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class BookingServiceImplTest {
 
     @Autowired
@@ -46,8 +48,7 @@ class BookingServiceImplTest {
         ItemDto itemDto = new ItemDto(1L, "FirstItem", "firstDescription", true,
                 itemRequestDto.getId());
         itemService.saveItem(userDto.getId(), itemDto);
-        UserDto secondUserDto = new UserDto(2L, "secondName", "second@mail.ru");
-        userService.saveUser(secondUserDto);
+        UserDto secondUserDto = userService.saveUser(new UserDto(2L, "secondName", "second@mail.ru"));
         BookingRequestDto bookingRequestDto =
                 new BookingRequestDto(itemDto.getId(),
                         LocalDateTime.now().minusHours(2).truncatedTo(ChronoUnit.SECONDS),

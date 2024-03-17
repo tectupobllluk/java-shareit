@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.enums.BookingStateEnum;
@@ -17,6 +18,7 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -52,13 +54,14 @@ class ItemServiceTest {
     private ItemService itemService;
 
     private final User owner = new User(1L, "name", "email@email.ru");
+    private final ItemRequest itemRequest = new ItemRequest(1L, "itemRequest", owner, LocalDateTime.now());
     private final Item item = new Item(1L, "itemName", "itemDescription",
-            true, owner, 11L);
+            true, owner, itemRequest);
     private final ItemDto itemDto = new ItemDto(1L, "itemName",
-            "itemDescription", true, 11L);
+            "itemDescription", true, 1L);
     private final ItemResponseDto itemResponseDto = new ItemResponseDto(1L, "itemName",
             "itemDescription", true, null, null,
-            Collections.emptyList(), 11L);
+            Collections.emptyList(), 1L);
     private final Booking lastBooking = new Booking(1L, LocalDateTime.now().minusHours(1)
             .truncatedTo(ChronoUnit.SECONDS), LocalDateTime.now().plusHours(1).truncatedTo(ChronoUnit.SECONDS), item,
             owner, BookingStateEnum.APPROVED, LocalDateTime.now().minusHours(2).truncatedTo(ChronoUnit.SECONDS));
@@ -70,13 +73,13 @@ class ItemServiceTest {
     private final CommentDto commentDto = new CommentDto(1L, "text",
             "name", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
     private final ItemResponseDto itemResponseDtoWithObjects = new ItemResponseDto(1L, "itemName",
-            "itemDescription", true, new ItemResponseDto.Booking(1L, LocalDateTime.now().minusHours(1)
+            "itemDescription", true, new BookingDto(1L, LocalDateTime.now().minusHours(1)
             .truncatedTo(ChronoUnit.SECONDS), LocalDateTime.now().plusHours(1).truncatedTo(ChronoUnit.SECONDS),
             1L, BookingStateEnum.APPROVED, LocalDateTime.now().minusHours(2).truncatedTo(ChronoUnit.SECONDS)),
-            new ItemResponseDto.Booking(2L, LocalDateTime.now().plusHours(2).truncatedTo(ChronoUnit.SECONDS),
+            new BookingDto(2L, LocalDateTime.now().plusHours(2).truncatedTo(ChronoUnit.SECONDS),
                     LocalDateTime.now().plusHours(3).truncatedTo(ChronoUnit.SECONDS), 1L,
                     BookingStateEnum.WAITING, LocalDateTime.now().minusHours(1).truncatedTo(ChronoUnit.SECONDS)),
-            List.of(commentDto), 11L);
+            List.of(commentDto), 1L);
 
     @Test
     void saveItem() {
@@ -103,7 +106,7 @@ class ItemServiceTest {
                 .hasFieldOrPropertyWithValue("lastBooking", null)
                 .hasFieldOrPropertyWithValue("nextBooking", null)
                 .hasFieldOrPropertyWithValue("comments", Collections.emptyList())
-                .hasFieldOrPropertyWithValue("requestId", 11L);
+                .hasFieldOrPropertyWithValue("requestId", 1L);
     }
 
     @Test

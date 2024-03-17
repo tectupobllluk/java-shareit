@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.enums.BookingStateEnum;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -39,11 +40,11 @@ class ItemControllerTest {
             LocalDateTime.now());
     private final ItemDto itemDto = new ItemDto(1L, "name", "description", true, 1L);
     private final ItemResponseDto itemResponseDto = new ItemResponseDto(1L, "name", "description",
-            true, new ItemResponseDto.Booking(1L, LocalDateTime.now().minusHours(1), LocalDateTime.now()
+            true, new BookingDto(1L, LocalDateTime.now().minusHours(1), LocalDateTime.now()
             .plusHours(1), 2L, BookingStateEnum.APPROVED, LocalDateTime.now().minusHours(2)),
-            new ItemResponseDto.Booking(2L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(2),
+            new BookingDto(2L, LocalDateTime.now().plusHours(1), LocalDateTime.now().plusHours(2),
                     3L, BookingStateEnum.WAITING, LocalDateTime.now().minusHours(1)),
-            List.of(commentDto), 11L);
+            List.of(commentDto), 1L);
     private final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
 
     @Test

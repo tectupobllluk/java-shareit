@@ -13,8 +13,11 @@ import ru.practicum.shareit.enums.BookingStateEnum;
 import ru.practicum.shareit.enums.RequestStateEnum;
 import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -49,10 +52,12 @@ class BookingServiceTest {
 
     private final User owner = new User(1L, "name", "email@email.ru");
     private final User secondOwner = new User(2L, "secondName", "secondEmail@email.ru");
+    private final ItemRequest itemRequest = new ItemRequest(1L, "description", owner,
+            LocalDateTime.now().minusHours(3).truncatedTo(ChronoUnit.SECONDS));
     private final Item item = new Item(1L, "itemName", "itemDescription",
-            true, owner, 11L);
+            true, owner, itemRequest);
     private final Item unavailableItem = new Item(1L, "itemName", "itemDescription",
-            false, owner, 11L);
+            false, owner, itemRequest);
     private final Booking booking = new Booking(1L, LocalDateTime.now().minusHours(1)
             .truncatedTo(ChronoUnit.SECONDS), LocalDateTime.now().plusHours(1).truncatedTo(ChronoUnit.SECONDS), item,
             owner, BookingStateEnum.APPROVED, LocalDateTime.now().minusHours(2).truncatedTo(ChronoUnit.SECONDS));
@@ -64,8 +69,8 @@ class BookingServiceTest {
                     LocalDateTime.now().plusHours(1).truncatedTo(ChronoUnit.SECONDS));
     private final BookingResponseDto bookingResponseDto = new BookingResponseDto(1L, LocalDateTime.now().minusHours(1)
             .truncatedTo(ChronoUnit.SECONDS), LocalDateTime.now().plusHours(1).truncatedTo(ChronoUnit.SECONDS),
-            new BookingResponseDto.Item(1L, "itemName", "itemDescription", true),
-            new BookingResponseDto.User(1L, "name", "email@email.ru"), BookingStateEnum.APPROVED);
+            new ItemDto(1L, "itemName", "itemDescription", true, 1L),
+            new UserDto(1L, "name", "email@email.ru"), BookingStateEnum.APPROVED);
 
     @Test
     void saveBooking() {

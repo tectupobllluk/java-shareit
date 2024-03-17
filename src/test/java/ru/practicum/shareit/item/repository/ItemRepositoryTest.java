@@ -41,16 +41,16 @@ class ItemRepositoryTest {
         ItemRequest itemRequest = new ItemRequest(1L, "itemRequest", owner, LocalDateTime.now());
         itemRequestRepository.save(itemRequest);
         Item availableName = new Item(1L, "nameBoatname", "description", true,
-                owner, 1L);
+                owner, itemRequest);
         itemRepository.save(availableName);
         Item availableDescription = new Item(2L, "name", "descriptionboatdescription", true,
-                owner, 1L);
+                owner, itemRequest);
         itemRepository.save(availableDescription);
         Item availableNoText = new Item(3L, "namename", "description", true,
-                owner, 1L);
+                owner, itemRequest);
         itemRepository.save(availableNoText);
         Item notAvailable = new Item(4L, "boatname", "descriptionboat", false,
-                owner, 1L);
+                owner, itemRequest);
         itemRepository.save(notAvailable);
 
         assertThat(itemRepository.search("unknown text", PageRequest.of(0, 5))

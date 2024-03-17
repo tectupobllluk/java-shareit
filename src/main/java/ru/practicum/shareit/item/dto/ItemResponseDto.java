@@ -1,9 +1,8 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.*;
-import ru.practicum.shareit.enums.BookingStateEnum;
+import ru.practicum.shareit.booking.dto.BookingDto;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,19 +16,8 @@ public class ItemResponseDto {
     private String name;
     private String description;
     private Boolean available;
-    private Booking lastBooking;
-    private Booking nextBooking;
+    private BookingDto lastBooking;
+    private BookingDto nextBooking;
     private List<CommentDto> comments = new ArrayList<>();
     private Long requestId;
-
-    @AllArgsConstructor
-    @Data
-    public static class Booking {
-        private Long id;
-        private LocalDateTime start;
-        private LocalDateTime end;
-        private Long bookerId;
-        private BookingStateEnum status;
-        private LocalDateTime creationTime;
-    }
 }

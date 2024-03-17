@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.enums.BookingStateEnum;
@@ -20,6 +21,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -36,12 +39,18 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     public ItemResponseDto saveItem(Long ownerId, ItemDto itemDto) {
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new NotFoundException("Owner with id " + ownerId + " is not created!"));
-        Item item = ItemMapper.toItem(owner, itemDto);
+        ItemRequest itemRequest = null;
+        if (itemDto.getRequestId() != null) {
+            itemRequest = itemRequestRepository.findById(itemDto.getRequestId())
+                    .orElse(null);
+        }
+        Item item = ItemMapper.toItem(owner, itemRequest, itemDto);
         return ItemMapper.toItemResponseDto(itemRepository.save(item));
     }
 
@@ -90,9 +99,7 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
         if (!lastBookingList.isEmpty()) {
             Booking lastBooking = lastBookingList.get(lastBookingList.size() - 1);
-            itemResponseDto.setLastBooking(new ItemResponseDto.Booking(
-                    lastBooking.getId(), lastBooking.getStart(), lastBooking.getEnd(), lastBooking.getBooker().getId(),
-                    lastBooking.getStatus(), lastBooking.getCreationTime()));
+            itemResponseDto.setLastBooking(BookingMapper.toBookingDto(lastBooking));
         }
         List<Booking> nextBookingList = bookingList.stream()
                 .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()) &&
@@ -100,9 +107,7 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
         if (!nextBookingList.isEmpty()) {
             Booking nextBooking = nextBookingList.get(0);
-            itemResponseDto.setNextBooking(new ItemResponseDto.Booking(
-                    nextBooking.getId(), nextBooking.getStart(), nextBooking.getEnd(), nextBooking.getBooker().getId(),
-                    nextBooking.getStatus(), nextBooking.getCreationTime()));
+            itemResponseDto.setNextBooking(BookingMapper.toBookingDto(nextBooking));
         }
     }
 

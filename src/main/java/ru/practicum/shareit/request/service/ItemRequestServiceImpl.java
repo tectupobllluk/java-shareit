@@ -7,6 +7,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.ItemRequestMapper;
@@ -52,9 +54,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private void loadItems(ItemRequestResponseDto itemRequestResponseDto) {
         List<Item> items = itemRepository.findByRequestId(itemRequestResponseDto.getId());
         if (!items.isEmpty()) {
-            List<ItemRequestResponseDto.Item> itemDto = items.stream()
-                    .map(item -> new ItemRequestResponseDto.Item(item.getId(), item.getName(),
-                            item.getDescription(), item.getAvailable(), item.getRequestId()))
+            List<ItemDto> itemDto = items.stream()
+                    .map(ItemMapper::toItemDto)
                     .collect(Collectors.toList());
             itemRequestResponseDto.setItems(itemDto);
         } else {
