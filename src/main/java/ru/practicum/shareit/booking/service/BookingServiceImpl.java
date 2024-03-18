@@ -1,12 +1,14 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.booking.BookingMapper;
-import ru.practicum.shareit.booking.dto.BookingDtoRequest;
-import ru.practicum.shareit.booking.dto.BookingDtoResponse;
+import ru.practicum.shareit.booking.dto.BookingRequestDto;
+import ru.practicum.shareit.booking.dto.BookingResponseDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.enums.BookingStateEnum;
@@ -33,28 +35,28 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
 
     @Override
-    public BookingDtoResponse saveBooking(Long ownerId, BookingDtoRequest bookingDtoRequest) {
+    public BookingResponseDto saveBooking(Long ownerId, BookingRequestDto bookingRequestDto) {
         User booker = userRepository.findById(ownerId)
                 .orElseThrow(() -> new NotFoundException("User with id - " + ownerId + " not found"));
-        Item item = itemRepository.findById(bookingDtoRequest.getItemId())
+        Item item = itemRepository.findById(bookingRequestDto.getItemId())
                 .orElseThrow(() ->
-                        new NotFoundException("Item with id - " + bookingDtoRequest.getItemId() + " not found"));
+                        new NotFoundException("Item with id - " + bookingRequestDto.getItemId() + " not found"));
         if (ownerId.equals(item.getOwner().getId())) {
             throw new NotFoundException("Owner can't book his own item");
         }
         if (!item.getAvailable()) {
             throw new BadRequestException("Item " + item + " unavailable for booking");
         }
-        if (bookingDtoRequest.getStart().isEqual(bookingDtoRequest.getEnd()) ||
-                bookingDtoRequest.getEnd().isBefore(bookingDtoRequest.getStart())) {
+        if (bookingRequestDto.getStart().isEqual(bookingRequestDto.getEnd()) ||
+                bookingRequestDto.getEnd().isBefore(bookingRequestDto.getStart())) {
             throw new BadRequestException("Timestamps must not be equal or end before start");
         }
-        Booking booking = BookingMapper.fromBookingDtoRequest(booker, item, bookingDtoRequest);
+        Booking booking = BookingMapper.toBooking(booker, item, bookingRequestDto);
         return BookingMapper.toBookingDtoResponse(bookingRepository.save(booking));
     }
 
     @Override
-    public BookingDtoResponse considerBooking(Long ownerId, Boolean approved, Long bookingId) {
+    public BookingResponseDto considerBooking(Long ownerId, Boolean approved, Long bookingId) {
         User user = userRepository.findById(ownerId)
                 .orElseThrow(() -> new NotFoundException("User with id - " + ownerId + " not found"));
         Booking booking = bookingRepository.findById(bookingId)
@@ -74,7 +76,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDtoResponse getBooking(Long userId, Long bookingId) {
+    public BookingResponseDto getBooking(Long userId, Long bookingId) {
         User requester = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id - " + userId + " not found"));
         Booking booking = bookingRepository.findById(bookingId)
@@ -86,44 +88,46 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoResponse> getAllUserBookings(Long userId, RequestStateEnum state) {
+    public List<BookingResponseDto> getAllUserBookings(Long userId, RequestStateEnum state, Integer from, Integer size) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id - " + userId + " not found"));
-        List<BookingDtoResponse> resultList = new ArrayList<>();
+        List<BookingResponseDto> resultList = new ArrayList<>();
         Sort sort = Sort.by(Sort.Direction.DESC, "creationTime");
+        Pageable page = PageRequest.of(from / size, size, sort);
         switch (state) {
             case ALL:
-                resultList = bookingRepository.findByBooker(user, sort).stream()
+                resultList = bookingRepository.findByBooker(user, page).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case PAST:
                 resultList = bookingRepository
-                        .findByBookerAndEndBefore(user, LocalDateTime.now(), sort).stream()
+                        .findByBookerAndEndBefore(user, LocalDateTime.now(), page).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case FUTURE:
                 resultList = bookingRepository
-                        .findByBookerAndStartAfter(user, LocalDateTime.now(), sort).stream()
+                        .findByBookerAndStartAfter(user, LocalDateTime.now(), page).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case CURRENT:
                 sort = Sort.by(Sort.Direction.ASC, "creationTime");
-                resultList = bookingRepository.findAllWithCurrentState(user, LocalDateTime.now(), sort).stream()
+                page = PageRequest.of(from / size, size, sort);
+                resultList = bookingRepository.findAllWithCurrentState(user, LocalDateTime.now(), page).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case WAITING:
                 resultList = bookingRepository
-                        .findByBookerAndStatus(user, BookingStateEnum.WAITING, sort).stream()
+                        .findByBookerAndStatus(user, BookingStateEnum.WAITING, page).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case REJECTED:
                 resultList = bookingRepository
-                        .findByBookerAndStatus(user, BookingStateEnum.REJECTED, sort).stream()
+                        .findByBookerAndStatus(user, BookingStateEnum.REJECTED, page).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
@@ -132,47 +136,50 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoResponse> getAllItemsBooking(Long userId, RequestStateEnum state) {
+    public List<BookingResponseDto> getAllItemsBooking(Long userId, RequestStateEnum state, Integer from, Integer size) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id - " + userId + " not found"));
         if (itemRepository.countByOwner(user) == 0) {
             return Collections.emptyList();
         }
-        List<BookingDtoResponse> resultList = new ArrayList<>();
+        List<BookingResponseDto> resultList = new ArrayList<>();
         Sort sort = Sort.by(Sort.Direction.DESC, "creationTime");
+        Pageable page = PageRequest.of(from / size, size, sort);
         switch (state) {
             case ALL:
-                resultList = bookingRepository.findByItem_Owner(user, sort).stream()
+                resultList = bookingRepository.findByItem_Owner(user, page).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case PAST:
                 resultList = bookingRepository
-                        .findByItem_OwnerAndEndBefore(user, LocalDateTime.now(), sort).stream()
+                        .findByItem_OwnerAndEndBefore(user, LocalDateTime.now(), page).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case FUTURE:
                 resultList = bookingRepository
-                        .findByItem_OwnerAndStartAfter(user, LocalDateTime.now(), sort).stream()
+                        .findByItem_OwnerAndStartAfter(user, LocalDateTime.now(), page).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case CURRENT:
                 sort = Sort.by(Sort.Direction.ASC, "creationTime");
-                resultList = bookingRepository.findAllItemsBookingWithCurrentState(user, LocalDateTime.now(), sort).stream()
+                page = PageRequest.of(from / size, size, sort);
+                resultList = bookingRepository
+                        .findAllItemsBookingWithCurrentState(user, LocalDateTime.now(), page).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case WAITING:
                 resultList = bookingRepository
-                        .findByItem_OwnerAndStatus(user, BookingStateEnum.WAITING, sort).stream()
+                        .findByItem_OwnerAndStatus(user, BookingStateEnum.WAITING, page).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
             case REJECTED:
                 resultList = bookingRepository
-                        .findByItem_OwnerAndStatus(user, BookingStateEnum.REJECTED, sort).stream()
+                        .findByItem_OwnerAndStatus(user, BookingStateEnum.REJECTED, page).stream()
                         .map(BookingMapper::toBookingDtoResponse)
                         .collect(Collectors.toList());
                 break;
